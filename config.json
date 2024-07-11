@@ -1,0 +1,16 @@
+{
+    "username": "10@yahoo.com",
+    "password": "1",
+    "job_titles": ["HR", "Software Engineer", "Cloud Engineer", "IT", "DevOps Engineer", "Data Scientist"],
+    "locations": ["San Francisco", "New York", "London", "Dallas", "Houston", "Austin", "Atlanta"],
+    "industries": ["Information Technology", "Computer Software", "Internet", "Financial Services", "Healthcare"],
+    "connection_interval_seconds": 3600,
+    "retry_max_retries": 3,
+    "retry_backoff_initial": 30,
+    "retry_backoff_factor": 2,
+    "message_templates": [
+        "Hi {first_name},\n\nI hope this message finds you well. I came across your profile and was impressed by your experience in {industry}. As a fellow {industry} professional, I'm expanding my network and would love to connect.\n\nBest regards,\nPavlo!",
+        "Hello {first_name},\n\nYour work as a {job_title} at {company_name} caught my attention. I'm looking to connect with more professionals in the {industry} field and thought you would be a great addition to my network.\n\nBest regards,\nPavlo!",
+        "Hi {first_name},\n\nI see you are a {job_title} at {company_name}. I'm expanding my network of {industry} professionals and would love to connect with you.\n\nBest regards,\nPavlo!"
+    ]
+}
