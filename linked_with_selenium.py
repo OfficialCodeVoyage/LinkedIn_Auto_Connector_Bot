@@ -125,7 +125,7 @@ def process_buttons(driver, base_message, max_requests):
 
 def send_connection_requests(driver, search_link, max_requests, base_message):
     driver.get(search_link)
-
+    time.sleep(7)
     while True:
         process_buttons(driver, base_message, max_requests)
         if not go_to_next_page(driver):
