@@ -1,14 +1,16 @@
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, MoveTargetOutOfBoundsException
+from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
+                                        MoveTargetOutOfBoundsException, ElementClickInterceptedException,
+                                        ElementNotInteractableException, StaleElementReferenceException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 import logging
 import time
+from typing import Optional
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,7 +33,7 @@ Best regards,
 Pavlo Bondarenko
 """
 
-def login_to_linkedin(driver, username, password):
+def login_to_linkedin(driver: webdriver.Firefox, username: str, password: str) -> None:
     try:
         driver.get("https://www.linkedin.com/login")
         WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "username")))
@@ -51,7 +53,7 @@ def login_to_linkedin(driver, username, password):
     except Exception as e:
         logging.error(f"Error during LinkedIn login: {e}")
 
-def process_buttons(driver, base_message, max_requests):
+def process_buttons(driver: webdriver.Firefox, base_message: str, max_requests: int) -> None:
     requests_sent = 0
     buttons_processed = 0
 
@@ -83,6 +85,8 @@ def process_buttons(driver, base_message, max_requests):
                     continue
 
                 if button_text.lower() == "connect":
+                    if not retry_click(driver, button):
+                        continue
                     try:
                         logging.info(f"Found Connect button with text: {button_text}")
                         send_connection_request(driver, button, base_message)
@@ -93,6 +97,8 @@ def process_buttons(driver, base_message, max_requests):
                         logging.info(f"Skipping already connected or unavailable user: {e}")
                         continue
                 elif button_text.lower() == "follow":
+                    if not retry_click(driver, button):
+                        continue
                     try:
                         logging.info(f"Found Follow button with text: {button_text}")
                         button.click()
@@ -117,7 +123,47 @@ def process_buttons(driver, base_message, max_requests):
         if not go_to_next_page(driver):
             break
 
-def send_connection_requests(driver, search_link, max_requests, base_message):
+def retry_click(driver: webdriver.Firefox, element: webdriver.remote.webelement.WebElement, retries: int = 3, delay: int = 2) -> bool:
+    for attempt in range(retries):
+        try:
+            driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            time.sleep(1)  # Ensure the element is in view
+            element.click()
+            return True
+        except ElementClickInterceptedException:
+            backoff_time = delay * (2 ** attempt)  # Exponential backoff
+            logging.warning(f"Attempt {attempt + 1}/{retries}: Element click intercepted, retrying in {backoff_time} seconds...")
+            close_modal_if_present(driver)
+            time.sleep(backoff_time)
+        except ElementNotInteractableException:
+            backoff_time = delay * (2 ** attempt)  # Exponential backoff
+            logging.warning(f"Attempt {attempt + 1}/{retries}: Element not interactable, retrying in {backoff_time} seconds...")
+            time.sleep(backoff_time)
+        except StaleElementReferenceException:
+            backoff_time = delay * (2 ** attempt)  # Exponential backoff
+            logging.warning(f"Attempt {attempt + 1}/{retries}: Stale element reference, retrying in {backoff_time} seconds...")
+            time.sleep(backoff_time)
+    logging.error(f"Failed to click the element after {retries} attempts.")
+    return False
+
+def close_modal_if_present(driver: webdriver.Firefox) -> None:
+    try:
+        modal_close_buttons = driver.find_elements(By.XPATH, "//button[@aria-label='Dismiss'] | //button[@class='artdeco-modal__dismiss'] | //button[@class='artdeco-hoverable-content__close-btn']")
+        for close_button in modal_close_buttons:
+            if close_button.is_displayed():
+                driver.execute_script("arguments[0].scrollIntoView(true);", close_button)
+                time.sleep(1)
+                close_button.click()
+                logging.info("Closed a modal dialog.")
+                time.sleep(2)
+    except NoSuchElementException:
+        logging.info("No modal dialog found to close.")
+    except ElementNotInteractableException:
+        logging.info("Modal dialog found but not interactable.")
+    except Exception as e:
+        logging.error(f"Error closing modal dialog: {e}")
+
+def send_connection_requests(driver: webdriver.Firefox, search_link: str, max_requests: int, base_message: str) -> None:
     driver.get(search_link)
 
     while True:
@@ -125,7 +171,7 @@ def send_connection_requests(driver, search_link, max_requests, base_message):
         if not go_to_next_page(driver):
             break
 
-def send_connection_request(driver, button, base_message):
+def send_connection_request(driver: webdriver.Firefox, button: webdriver.remote.webelement.WebElement, base_message: str) -> None:
     try:
         button.click()
         WebDriverWait(driver, 10).until(
@@ -145,10 +191,21 @@ def send_connection_request(driver, button, base_message):
         logging.info(f"Connection request sent.")
 
         time.sleep(10)  # Sleep for 10 seconds after sending each connection request
+    except NoSuchElementException as e:
+        logging.error(f"Error sending connection request - No such element: {e}")
+    except TimeoutException as e:
+        logging.error(f"Error sending connection request - Timeout: {e}")
+    except ElementClickInterceptedException as e:
+        logging.error(f"Error sending connection request - Element click intercepted: {e}")
+        close_modal_if_present(driver)
+    except ElementNotInteractableException as e:
+        logging.error(f"Error sending connection request - Element not interactable: {e}")
+    except StaleElementReferenceException as e:
+        logging.error(f"Error sending connection request - Stale element reference: {e}")
     except Exception as e:
         logging.error(f"Error sending connection request: {e}")
 
-def go_to_next_page(driver):
+def go_to_next_page(driver: webdriver.Firefox) -> bool:
     try:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")   # Scroll down
         next_page_button = WebDriverWait(driver, 20).until(
@@ -157,8 +214,9 @@ def go_to_next_page(driver):
         next_page_button.click()
         logging.info("Navigated to the next page")
         time.sleep(5)  # Wait for the new page to load
-    except NoSuchElementException as e:
-        logging.error(f"Element not found: {e}")
+    except (NoSuchElementException, ElementClickInterceptedException) as e:
+        logging.error(f"Element not found or not clickable: {e}")
+        close_modal_if_present(driver)
         return False
     except Exception as e:
         logging.error(f"Error navigating to the next page: {e}")
