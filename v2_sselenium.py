@@ -16,8 +16,8 @@ from typing import Optional
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Replace with your LinkedIn credentials
-LINKEDIN_USERNAME = 'bondarenkopavloua@yahoo.com'
-LINKEDIN_PASSWORD = 'Ploik1234'
+LINKEDIN_USERNAME = '#'
+LINKEDIN_PASSWORD = '#'
 
 # Replace with your search link
 SEARCH_LINK = 'https://www.linkedin.com/search/results/people/?activelyHiringForJobTitles=%5B%22-100%22%5D&geoUrn=%5B%22103644278%22%5D&keywords=tech%20recruiter&origin=FACETED_SEARCH&searchId=3226caea-b928-4aec-9985-46e505d5f6b7&sid=3C5'
