@@ -1,114 +1,125 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+require('dotenv').config();
 
-const LINKEDIN_USERNAME = '@@yahoo.com';
-const LINKEDIN_PASSWORD = '@';
-const SEARCH_LINK = 'https://www.linkedin.com/search/results/people/?keywords=tech%20recruiter';
-const BASE_CONNECTION_MESSAGE = `Hi {name},
-
-I hope this message finds you well. I'm exploring new opportunities in tech and would love to connect. I have a strong background in Azure Cloud and Software Development, with a focus on Cloud Engineering and AI/ML.
-
-Looking forward to connecting!
-
-Best regards,
-Your Name
-`;
-
-(async () => {
+async function launchBrowser() {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-    page.setDefaultTimeout(10000); // Increase default timeout to 60 seconds
+    await page.setViewport({ width: 1920, height: 1080 });
+    page.setDefaultTimeout(60000);
+    return { browser, page };
+}
 
-    // Log in to LinkedIn
+async function loginToLinkedIn(page) {
+    console.log('Navigating to LinkedIn login page...');
     await page.goto('https://www.linkedin.com/login');
-    await page.type('#username', LINKEDIN_USERNAME);
-    await page.type('#password', LINKEDIN_PASSWORD);
+    await page.type('#username', "#@yahoo.com");
+    await page.type('#password', "#");
     await page.click('.btn__primary--large');
+    await new Promise(r => setTimeout(r, 2000));
     await page.waitForNavigation();
+    console.log('Logged in to LinkedIn.');
+}
 
-    // Go to search results page
-    await page.goto(SEARCH_LINK);
+async function handleOverlays(page) {
+    const messagingOverlayCloseButton = await page.$('button.msg-overlay-bubble-header__control');
+    if (messagingOverlayCloseButton) {
+        console.log('Messaging overlay found. Closing it...');
+        await messagingOverlayCloseButton.click();
+    }
+}
 
+async function performSearch(page) {
+    console.log('Navigating to search results page...');
+    await page.goto('https://www.linkedin.com/search/results/people/?keywords=tech%20recruiter');
+    await page.waitForTimeout(5000);
+}
+
+async function scrollPage(page) {
+    let previousHeight;
+    while (true) {
+        previousHeight = await page.evaluate('document.body.scrollHeight');
+        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+        await page.waitForTimeout(2000);
+        let currentHeight = await page.evaluate('document.body.scrollHeight');
+        if (currentHeight === previousHeight) break;
+    }
+    console.log('Finished scrolling.');
+}
+
+async function sendConnectionRequests(page, maxRequests = 50) {
     let requestsSent = 0;
-    const maxRequests = 50;
 
     while (requestsSent < maxRequests) {
-        try {
-            // Wait for search results to load
-            await page.waitForSelector('.reusable-search__entity-result-list', { timeout: 60000 });
-            console.log('Search results loaded.');
+        const buttons = await page.$$('button span.artdeco-button__text');
+        const relevantButtons = [];
 
-            // Get all "Connect" buttons
-            const connectButtons = await page.$x("//span[text()='Connect' and contains(@class, 'artdeco-button__text')]/ancestor::button");
-
-            console.log(`Found ${connectButtons.length} Connect buttons on the page.`);
-            connectButtons.forEach((button, index) => {
-                console.log(`Button ${index + 1}: ${button}`);
-            });
-
-            if (connectButtons.length === 0) {
-                console.log('No Connect buttons found on this page.');
-                // Check if there is a next page
-                const nextPageButton = await page.$('button[aria-label="Next"]');
-                if (nextPageButton) {
-                    await nextPageButton.click();
-                    await page.waitForNavigation();
-                    continue;
-                } else {
-                    console.log('No more pages left.');
-                    break;
-                }
+        for (let i = 0; i < buttons.length; i++) {
+            const buttonText = await page.evaluate(el => el.textContent.trim(), buttons[i]);
+            if (['Connect', 'Follow', 'Message'].includes(buttonText)) {
+                relevantButtons.push(buttons[i]);
             }
+        }
 
-            for (let button of connectButtons) {
-                if (requestsSent >= maxRequests) break;
+        console.log(`Filtered to ${relevantButtons.length} relevant buttons.`);
+        if (relevantButtons.length === 0) break;
 
+        for (let button of relevantButtons) {
+            const buttonText = await page.evaluate(el => el.textContent.trim(), button);
+            if (buttonText === 'Connect' && requestsSent < maxRequests) {
                 try {
-                    // Scroll into view and click the Connect button
-                    await button.evaluate(b => b.scrollIntoView());
-                    await button.click();
+                    const parentButton = await button.evaluateHandle(el => el.closest('button'));
+                    await parentButton.evaluate(b => b.scrollIntoView());
+                    await parentButton.click();
 
-                    // Wait for the "Add a note" button to appear and click it
-                    await page.waitForSelector('button[aria-label="Add a note"]', { timeout: 10000 });
-                    await page.click('button[aria-label="Add a note"]');
+                    try {
+                        await page.waitForSelector('button[aria-label="Add a note"]', { visible: true, timeout: 15000 });
+                        await page.click('button[aria-label="Add a note"]');
+                        const message = `Hi there,\n\nI hope this message finds you well. I'm exploring new opportunities in tech and would love to connect. I have a strong background in Azure Cloud and Software Development, with a focus on Cloud Engineering and AI/ML.\n\nLooking forward to connecting!\n\nBest regards,\nYour Name`;
+                        await page.type('#custom-message', message);
+                        await page.click('button[aria-label="Send now"]');
+                    } catch (noteError) {
+                        console.log('Add a note button not found, sending request without note.');
+                        await page.click('button[aria-label="Send now"]');
+                    }
 
-                    // Get recruiter's name
-                    const recruiterName = await page.evaluate(button => {
-                        const parentDiv = button.closest('.entity-result__item');
-                        const nameElement = parentDiv.querySelector('.entity-result__title-text a span[1]');
-                        return nameElement ? nameElement.innerText.trim() : 'there';
-                    }, button);
-
-                    // Type and send the connection message
-                    const message = BASE_CONNECTION_MESSAGE.replace('{name}', recruiterName);
-                    await page.type('#custom-message', message);
-                    await page.click('button[aria-label="Send now"]');
-
-                    console.log(`Connection request sent to ${recruiterName}.`);
                     requestsSent++;
-                    await page.waitForTimeout(10000); // Wait 10 seconds between requests
-                } catch (e) {
-                    console.log(`Error sending connection request: ${e}`);
+                    console.log(`Requests sent: ${requestsSent}`);
+                    await page.waitForTimeout(10000);
+                } catch (clickError) {
+                    console.log(`Error sending connection request: ${clickError}`);
                     continue;
                 }
             }
+        }
 
-            // Go to the next page
-            const nextPageButton = await page.$('button[aria-label="Next"]');
-            if (nextPageButton) {
-                await nextPageButton.click();
-                await page.waitForNavigation();
-            } else {
-                console.log('No more pages left.');
-                break;
-            }
-        } catch (e) {
-            console.log(`Error during operation: ${e}`);
-            const pageContent = await page.content();
-            fs.writeFileSync('pageContent.html', pageContent); // Save the current page content to analyze the issue
+        const nextPageButton = await page.$('button[aria-label="Next"]');
+        if (nextPageButton) {
+            await nextPageButton.evaluate(b => b.scrollIntoView());
+            await nextPageButton.click();
+            await page.waitForNavigation();
+            console.log('Navigated to the next page.');
+        } else {
+            console.log('No more pages left.');
             break;
         }
     }
+}
 
-    await browser.close();
+(async () => {
+    const { browser, page } = await launchBrowser();
+
+    try {
+        await loginToLinkedIn(page);
+        await handleOverlays(page);
+        await performSearch(page);
+        await scrollPage(page);
+        await sendConnectionRequests(page);
+    } catch (err) {
+        console.log(`Unexpected error: ${err}`);
+    } finally {
+        console.log('Closing browser...');
+        await browser.close();
+        console.log('Browser closed.');
+    }
 })();

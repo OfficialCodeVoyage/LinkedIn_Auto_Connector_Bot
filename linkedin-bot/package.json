@@ -1,15 +1,22 @@
 {
   "name": "linkedin-bot",
   "version": "1.0.0",
+  "description": "A LinkedIn automation bot using Puppeteer",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "puppeteer": "^22.14.0"
-  }
+    "dotenv": "^16.4.5",
+    "puppeteer": "^21.3.3"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 60000
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }

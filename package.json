@@ -1,5 +1,6 @@
 {
-  "dependencies": {
-    "puppeteer": "^22.14.0"
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "puppeteer": "^22.15.0"
   }
 }
