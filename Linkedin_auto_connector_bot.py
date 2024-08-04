@@ -3,7 +3,7 @@ This script is a LinkedIn bot that automatically sends connection requests with 
 It uses the Selenium WebDriver to navigate LinkedIn and interact with the UI elements.
 Do 100 requests per week!!!!!
 If not, LinkedIn will block your account.
-Add my Linkedin also - https://www.linkedin.com/in/mrbondarenko/
+Add my LinkedIn also - https://www.linkedin.com/in/mrbondarenko/
 Have fun!
 """
 
