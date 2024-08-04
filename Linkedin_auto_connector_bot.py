@@ -5,8 +5,8 @@ Do 100 requests per week!!!!!
 If not, LinkedIn will block your account.
 Add my LinkedIn also - https://www.linkedin.com/in/mrbondarenko/
 Replace your search link with keywords you need!
-Go to LinkedIn main page, press on the search bar, put the keywords you need, press enter, select people only!
- copy the link and paste it in the SEARCH_LINK variable.
+Go to LinkedIn main page, press on the search bar, put the keywords you need(Tech Recruter or Cloud Engineer for example),
+press enter, select people only! copy the link and paste it in the SEARCH_LINK variable.
  Have fun!
 """
 
