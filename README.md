@@ -70,4 +70,62 @@ cd LinkedIn_Auto_Connector_Bot
 pip install -r requirements.txt
 ```
 
-# P.S Will finish tommorrow ....
+## 🛠️ Configuration
+
+1. 🔐 Set up LinkedIn credentials:
+   Change the ```LINKEDIN_USERNAME``` and ```LINKEDIN_PASSWORD``` in the ```Linkedin_auto_connector_bot.py```.
+
+2. 🔍 Customize Your Search Link:
+   Follow the instructions provided in the Quick Start Guide to generate your LinkedIn search link. Replace the SEARCH_LINK variable in the 
+   ```Linkedin_auto_connector_bot.py``` with your copied search link.
+
+3. 📝 Configure Message Template:
+   Adjust the for ```BASE_CONNECTION_MESSAGE ``` your needs in the ```Linkedin_auto_connector_bot.py```.
+
+   
+## 🚀 Usage
+### 🏃 Running the Bot
+
+```bash
+python linkedin_bot.py
+```
+The bot will log into your LinkedIn account and begin sending connection requests based on the search criteria provided in your SEARCH_LINK.
+
+### 📜 Logging
+Logs of sent connection requests and responses are saved in the logs directory. You can review these logs to analyze the performance of your outreach strategy.
+
+### 🤝 Contributing
+
+Contributions are welcome! Please follow these steps to contribute:
+
+🍴 Fork the repository.
+
+🌿 Create a new branch (git checkout -b feature-branch).
+
+💻 Make your changes.
+
+📝 Commit your changes (git commit -am 'Add new feature').
+
+🚀 Push to the branch (git push origin feature-branch).
+
+📬 Open a pull request.
+
+
+### 📄 License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+### ⚠️ Disclaimer
+This bot is intended for educational and research purposes only. The use of automated bots on LinkedIn may violate LinkedIn's terms of service. Use at your own risk.
+
+### 🛠️ Support
+For any questions or issues, please feel free to reach out via GitHub Issues or Discussions.
+
+### 🙌 Acknowledgements
+🤖 Selenium for web automation
+
+🐍 Python for providing the programming language
+
+🌍 The LinkedIn community for providing a platform to connect professionals worldwide
+
+
+Made with ❤️ by [Pavlo Bondarenko](https://www.linkedin.com/in/mrbondarenko/)
