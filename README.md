@@ -10,7 +10,7 @@
 
 ## 🌟 Overview
 
-The LinkedIn Auto Connector Bot is a powerful tool designed to automate connection requests on LinkedIn. This bot helps users expand their professional network by sending connection requests to a targeted audience based on specified search criteria. It can be customized to send personalized connection messages and can handle multiple LinkedIn accounts.
+The LinkedIn Auto Connector Bot is a powerful tool designed to automate connection requests on LinkedIn. This bot helps users expand their professional network by sending connection requests to a targeted audience based on specified search criteria. It can be customized to send personalized connection messages.
 
 :star::star::star::star::star: ---> Star the Repo!
 
