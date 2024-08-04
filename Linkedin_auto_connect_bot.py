@@ -1,3 +1,12 @@
+"""
+This script is a LinkedIn bot that automatically sends connection requests with a custom note to profiles on LinkedIn.
+It uses the Selenium WebDriver to navigate LinkedIn and interact with the UI elements.
+Do 100 requests per week!!!!!
+If not, LinkedIn will block your account.
+Add my Linkedin also - https://www.linkedin.com/in/mrbondarenko/
+Have fun!
+"""
+
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, MoveTargetOutOfBoundsException
 from selenium.webdriver.common.by import By
@@ -13,8 +22,8 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Replace with your LinkedIn credentials
-LINKEDIN_USERNAME = '#@yahoo.com'
-LINKEDIN_PASSWORD = '#'
+LINKEDIN_USERNAME = '#@yahoo.com' # your email
+LINKEDIN_PASSWORD = '#' # your password
 
 SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22103644278%22%5D&keywords=tech%20recruiter"
                "&origin=FACETED_SEARCH&sid=8VI")
@@ -151,9 +160,10 @@ def process_buttons(driver):
 
 if __name__ == "__main__":
     options = Options()
-    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe'
+    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe' ## path to your firefox browser(must install firefox browser)
 
-    # Set up the webdriver (Replace the path with the path to your webdriver)
+    # Set up the webdriver (Replace the path with the path to your webdriver) // mine is geckodriver32.exe already installed in the directory
+    # go to https://github.com/mozilla/geckodriver/releases to download latest version of geckodriver
     service = Service('geckodriver32.exe')
     driver = webdriver.Firefox(service=service, options=options)
 
