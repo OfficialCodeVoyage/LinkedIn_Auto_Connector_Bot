@@ -17,7 +17,9 @@ The LinkedIn Auto Connector Bot is a powerful tool designed to automate connecti
 This script is a LinkedIn bot that automatically sends connection requests with a custom note to profiles on LinkedIn. It uses the Selenium WebDriver to navigate LinkedIn and interact with the UI elements.
 
 🚨🚨🚨 **Do not exceed 100 requests per week!**  🚨🚨🚨
+
 LinkedIn may block your account if you exceed this limit.
+
 P.S. For LinkedIn team - ooops, sorry! I was boring! 
 
 ### 🚀 Quick Start Guide
@@ -48,7 +50,7 @@ P.S. For LinkedIn team - ooops, sorry! I was boring!
 
 ### 📋 Prerequisites
 
-- [Python 3.7+](https://www.python.org/downloads/)
+- [Python 3.8+](https://www.python.org/downloads/)
 - [🌐 Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/) browser
 - [🦊 Geckodriver download page](https://github.com/mozilla/geckodriver/releases) (Ensure that the Geckodriver version matches your installed version of Firefox)
 
