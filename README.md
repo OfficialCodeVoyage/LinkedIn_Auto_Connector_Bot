@@ -22,7 +22,7 @@ This script is a LinkedIn bot that automatically sends connection requests with 
 
 # 🚨🚨🚨 Please use it on your own risk! This is against LinkedIn policy. You may get banned if they catch you! 🚨🚨🚨
 
-## 🚨🚨🚨 **Do not exceed 100 requests per week!**  🚨🚨🚨
+## 🚨🚨🚨 **Do not exceed 80 requests per week!**  🚨🚨🚨
 
 ### LinkedIn may block your account if you exceed this limit.
 
