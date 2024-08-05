@@ -25,11 +25,10 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Replace with your LinkedIn credentials
-LINKEDIN_USERNAME = '#@yahoo.com' # your email
-LINKEDIN_PASSWORD = '#' # your password
+LINKEDIN_USERNAME = 'bondarenkopavloua@yahoo.com' # your email
+LINKEDIN_PASSWORD = 'Okiuj1234$' # your password
 
-SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22103644278%22%5D&keywords=tech%20recruiter"
-               "&origin=FACETED_SEARCH&sid=8VI")
+SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?activelyHiringForJobTitles=%5B%22-100%22%5D&geoUrn=%5B%22103644278%22%5D&keywords=tech%20recruiter&origin=FACETED_SEARCH&searchId=04546185-7b0b-460a-b891-c625e25c973e&sid=SWY")
 
 # Base connection message template
 BASE_CONNECTION_MESSAGE = """Hi there,
@@ -41,6 +40,8 @@ Looking forward to connecting!
 Best regards,
 Pavlo Bondarenko
 """
+
+MAX_CONNECT_REQUESTS = 10  # Limit for connection requests
 
 def login_to_linkedin(driver, username, password):
     try:
@@ -131,7 +132,12 @@ def process_buttons(driver):
         scrool_down(driver)
         time.sleep(5)
 
-        while True:
+        connect_requests_sent = 0
+
+        working = True
+
+
+        while working:
             # Find all buttons on the page
             buttons = driver.find_elements(By.TAG_NAME, "button")
 
@@ -144,10 +150,18 @@ def process_buttons(driver):
             # Process each "Connect" and "Follow" button
             for button in buttons:
                 button_text = button.text.strip().lower()
-                if button_text == "connect":
+                if button_text == "connect" and connect_requests_sent < MAX_CONNECT_REQUESTS:
                     handle_connect_button(driver, button)
+                    connect_requests_sent += 1
+                    if connect_requests_sent >= MAX_CONNECT_REQUESTS:
+                        logging.info(
+                            f"Reached the limit of {MAX_CONNECT_REQUESTS} connection requests. Stopping connection requests.")
+                        working = False
+                        break
+                    time.sleep(5)
                 elif button_text == "follow":
                     handle_follow_button(button)
+                    time.sleep(5)
 
             # Attempt to navigate to the next page
             if not go_to_next_page(driver):
