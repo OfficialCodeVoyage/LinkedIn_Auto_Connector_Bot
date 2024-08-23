@@ -25,11 +25,10 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Replace with your LinkedIn credentials
-LINKEDIN_USERNAME = 'bondarenkopavloua@yahoo.com' # your email
-LINKEDIN_PASSWORD = 'Okiuj1234$' # your password
+LINKEDIN_USERNAME = '#' # your email
+LINKEDIN_PASSWORD = '#' # your password
 
-SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?activelyHiringForJobTitles=%5B%22-100%22%5D&geoUrn=%5B%22103644278%22%5D&keywords=tech%20recruiter&origin=FACETED_SEARCH&searchId=04546185-7b0b-460a-b891-c625e25c973e&sid=SWY")
-
+SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22103644278%22%5D&keywords=technical%20software%20recruiter&origin=FACETED_SEARCH&page=26&sid=h)4")
 # Base connection message template
 BASE_CONNECTION_MESSAGE = """Hi there,
 
@@ -41,7 +40,7 @@ Best regards,
 Pavlo Bondarenko
 """
 
-MAX_CONNECT_REQUESTS = 10  # Limit for connection requests
+MAX_CONNECT_REQUESTS = 20  # Limit for connection requests
 
 def login_to_linkedin(driver, username, password):
     try:
