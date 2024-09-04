@@ -11,7 +11,7 @@ press enter, select people only! copy the link and paste it in the SEARCH_LINK v
 """
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, MoveTargetOutOfBoundsException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, MoveTargetOutOfBoundsException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -25,10 +25,12 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Replace with your LinkedIn credentials
-LINKEDIN_USERNAME = '#' # your email
-LINKEDIN_PASSWORD = '#' # your password
+LINKEDIN_USERNAME = '#@yahoo.com' # your email
+LINKEDIN_PASSWORD = '' # your password
 
-SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22103644278%22%5D&keywords=technical%20software%20recruiter&origin=FACETED_SEARCH&page=26&sid=h)4")
+MAX_RETRIES = 5  # Maximum number of retries for refreshing
+
+SEARCH_LINK = ("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22103644278%22%5D&keywords=technical%20recruiter&origin=GLOBAL_SEARCH_HEADER&page=14")
 # Base connection message template
 BASE_CONNECTION_MESSAGE = """Hi there,
 
@@ -87,34 +89,41 @@ def scrool_down(driver):
     except Exception as e:
         logging.error(f"Error during scrolling down: {e}")
 
-def handle_connect_button(driver, button):
-    try:
-        button.click()
-        time.sleep(2)  # Wait for the connect modal to appear
+def handle_connect_button_with_retry(driver, button):
+    retry_count = 0
+    while retry_count < MAX_RETRIES:
+        try:
+            button.click()
+            time.sleep(2)
 
-        # Click "Add a note"
-        add_note_button = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Add a note']"))
-        )
-        add_note_button.click()
-        time.sleep(2)
+            add_note_button = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Add a note']"))
+            )
+            add_note_button.click()
+            time.sleep(2)
 
-        # Paste the custom message
-        message_box = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']"))
-        )
-        message_box.send_keys(BASE_CONNECTION_MESSAGE)
-        time.sleep(2)
+            message_box = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']"))
+            )
+            message_box.send_keys(BASE_CONNECTION_MESSAGE)
+            time.sleep(2)
 
-        # Click "Send"
-        send_button = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//span[contains(@class, 'artdeco-button__text') and text()='Send']"))
-        )
-        send_button.click()
-        logging.info("Sent connection request with a custom note.")
-        time.sleep(2)
-    except Exception as e:
-        logging.error(f"Error handling 'Connect' button: {e}")
+            send_button = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//span[contains(@class, 'artdeco-button__text') and text()='Send']"))
+            )
+            send_button.click()
+            logging.info("Sent connection request with a custom note.")
+            time.sleep(2)
+            return  # Exit the function if successful
+        except ElementClickInterceptedException as e:
+            logging.error(f"Error: Element not clickable, retrying... {e}")
+            retry_count += 1
+            if not refresh_page(driver, retry_count):  # Try refreshing the page
+                logging.error("Unable to resolve the error after retries. Exiting.")
+                break
+        except Exception as e:
+            logging.error(f"Error handling 'Connect' button: {e}")
+            break
 
 def handle_follow_button(button):
     try:
@@ -150,7 +159,7 @@ def process_buttons(driver):
             for button in buttons:
                 button_text = button.text.strip().lower()
                 if button_text == "connect" and connect_requests_sent < MAX_CONNECT_REQUESTS:
-                    handle_connect_button(driver, button)
+                    handle_connect_button_with_retry(driver, button)
                     connect_requests_sent += 1
                     if connect_requests_sent >= MAX_CONNECT_REQUESTS:
                         logging.info(
@@ -173,6 +182,24 @@ def process_buttons(driver):
 
     except Exception as e:
         logging.error(f"Error while processing buttons: {e}")
+
+
+def refresh_page(driver, retries):
+    for attempt in range(1, retries + 1):
+        try:
+            logging.info(f"Attempt {attempt}/{retries}: Refreshing the page.")
+            driver.refresh()  # Refresh the page
+            time.sleep(5)  # Wait for the page to reload
+            return True
+        except Exception as e:
+            logging.error(f"Error during page refresh: {e}")
+
+        if attempt == retries:
+            logging.error("Maximum retries reached. Exiting the program.")
+            driver.quit()
+            exit(1)
+    return False
+
 
 if __name__ == "__main__":
     options = Options()
