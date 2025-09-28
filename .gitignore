@@ -1,1 +1,192 @@
+# Environment Variables
 .env
+.env.*
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+.virtualenv
+virtualenvs/
+
+# IDE and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.history/
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+*.log.*
+log/
+logging/
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+nosetests.xml
+test-results/
+
+# WebDriver
+geckodriver.log
+chromedriver.log
+*.exe
+!geckodriver32.exe  # Keep the specific driver for the project
+drivers/
+webdriver/
+
+# Temporary Files
+*.tmp
+*.temp
+tmp/
+temp/
+.temp/
+*.bak
+*.backup
+*.old
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+db.json
+
+# Configuration (except examples)
+config.ini
+config.json
+config.yaml
+config.yml
+!config.example.*
+settings.json
+!settings.example.json
+
+# Credentials and Secrets
+credentials.json
+secrets.json
+*.pem
+*.key
+*.crt
+*.pfx
+.secrets/
+private/
+
+# Session Files
+session/
+sessions/
+*.session
+cookies.txt
+
+# Output Files
+output/
+exports/
+results/
+data/
+screenshots/
+*.csv
+*.xlsx
+!sample_data/
+
+# Documentation Build
+docs/_build/
+site/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Node (if adding frontend later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MacOS
+.AppleDouble
+.LSOverride
+Icon
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# Project Specific
+connection_history.json
+metrics.json
+stats.json
+user_profiles/
+cache/
